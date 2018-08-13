@@ -28,9 +28,15 @@ public class BoxSocket {
         }
         JSONObject obj = new JSONObject();
         obj.put("mac", macAddress);
-        boxEndpoint.sendMessage("Hello from client, my mac address is : "+macAddress);
-         
-        Thread.sleep(2000);
+        
+        boxEndpoint.sendMessage(obj.toString());
+        
+        while(session.isOpen()){
+            if(boxEndpoint.hasRequest()){
+                boxEndpoint.manageRequest();
+            }
+            Thread.sleep(1000);
+        }
     }
     
     
