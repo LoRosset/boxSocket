@@ -20,7 +20,7 @@ public class BoxSocket {
     public static void main(String[] args) throws DeploymentException, IOException, URISyntaxException, InterruptedException {
         BoxEndpoint boxEndpoint = new BoxEndpoint();
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        Session session = container.connectToServer(boxEndpoint, new URI("ws://www.camera-stream.tk:8001"));
+        Session session = container.connectToServer(boxEndpoint, new URI("ws://localhost:8001"));
         
         String macAddress = tools.GetNetworkAddress.GetAddress("mac");
         if(macAddress != null){
@@ -32,7 +32,7 @@ public class BoxSocket {
         boxEndpoint.sendMessage(obj.toString());
         
         while(session.isOpen()){
-            if(boxEndpoint.hasRequest()){
+            if(boxEndpoint.hasRequest() && boxEndpoint.getManaging()==false){
                 boxEndpoint.manageRequest();
             }
             Thread.sleep(1000);

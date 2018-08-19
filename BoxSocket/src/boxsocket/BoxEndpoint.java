@@ -24,6 +24,7 @@ public class BoxEndpoint extends Endpoint {
     private ArrayList<String> cameras = new ArrayList<String>();
     private ArrayList<Process> connexionsCam = new ArrayList<Process>();
     private final String FILENAME = "./listeCam.txt";
+    private boolean managing = false;
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {
@@ -40,23 +41,28 @@ public class BoxEndpoint extends Endpoint {
     }
     
     public void manageRequest() throws FileNotFoundException, IOException{
+        managing = true;
         String message = store.get(0);
         JSONObject msg = new JSONObject(message);
-        if(msg.getString("msg") == "camera"){
+        if(msg.getString("msg").compareTo("camera") == 0){
+            System.out.println("Try to send cameras");
             try(BufferedReader br = new BufferedReader(new FileReader(FILENAME))){
                 String currentLine;
                 JSONObject obj = new JSONObject();
                 int i = 0;
                 while((currentLine = br.readLine()) != null){
-                    i++;
-                    obj.put("camera"+i, currentLine);
+                    obj.put("ip", currentLine);
+                    obj.put("name", "camera"+i);
                     cameras.add(i, currentLine);
+                    i++;
                 }
                 if(i!=0){
                     sendMessage(obj.toString());
+                    store.remove(0);
+                    managing = false;
                 }
             }
-        } else if(msg.getString("msg") == "connexion"){
+        } else if(msg.getString("msg").compareTo("connexion") == 0){
             String camera = msg.getString("camera");
             camera.replaceAll("[^0-9]", "");
             int i = Integer.parseInt(camera);
@@ -78,6 +84,10 @@ public class BoxEndpoint extends Endpoint {
         else{
             return true;
         }
+    }
+    
+    public boolean getManaging(){
+        return this.managing;
     }
     
     public void sendMessage(String message) throws IOException {
