@@ -73,6 +73,8 @@ public class BoxEndpoint extends Endpoint {
             connexionsCam.add(pr);
         } else if(msg.getString("msg")=="kill"){
             connexionsCam.get(0).destroy();
+        } else {
+            System.out.println(msg);
         }
         
     }
