@@ -87,6 +87,7 @@ public class BoxEndpoint extends Endpoint {
         } else if(msg.getString("msg").compareTo("kill") == 0){
             System.out.println("Kill the connexion");
             String camera = msg.getString("camera");
+            camera = camera.replaceAll("[^0-9]", "");
             connexionsCam.get(camera).destroy();
             connexionsCam.remove(camera);
             store.remove(0);
