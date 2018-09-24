@@ -82,7 +82,7 @@ public class BoxEndpoint extends Endpoint {
             System.out.println("Connexion with camera is opened !");
             connexionsCam.put(camera, pr);
         //Kill the connexion to a specific camera
-        } else if(msg.getString("msg")=="kill"){
+        } else if(msg.getString("msg").compareTo("kill") == 0){
             System.out.println("Kill the connexion");
             String camera = msg.getString("camera");
             connexionsCam.get(camera).destroy();
