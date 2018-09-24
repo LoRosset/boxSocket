@@ -79,9 +79,11 @@ public class BoxEndpoint extends Endpoint {
             String command = "ssh -f -N -T -l loic -R8554:"+ip+":80 51.15.227.253";
             Runtime rt = Runtime.getRuntime();
             Process pr = rt.exec(command);
+            System.out.println("Connexion with camera is opened !");
             connexionsCam.put(camera, pr);
         //Kill the connexion to a specific camera
         } else if(msg.getString("msg")=="kill"){
+            System.out.println("Kill the connexion");
             String camera = msg.getString("camera");
             connexionsCam.get(camera).destroy();
         //Everything else
