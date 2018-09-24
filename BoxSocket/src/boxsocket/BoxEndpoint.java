@@ -81,14 +81,18 @@ public class BoxEndpoint extends Endpoint {
             Process pr = rt.exec(command);
             System.out.println("Connexion with camera is opened !");
             connexionsCam.put(camera, pr);
+            managing = false;
         //Kill the connexion to a specific camera
         } else if(msg.getString("msg").compareTo("kill") == 0){
             System.out.println("Kill the connexion");
             String camera = msg.getString("camera");
             connexionsCam.get(camera).destroy();
+            connexionsCam.remove(camera);
+            managing = false;
         //Everything else
         } else {
             System.out.println(msg);
+            managing = false;
         }
         
     }
