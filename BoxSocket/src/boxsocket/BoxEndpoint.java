@@ -6,11 +6,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.websocket.EncodeException;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -22,7 +24,7 @@ public class BoxEndpoint extends Endpoint {
     private Session session;
     private ArrayList<String> store = new ArrayList<String>();
     private ArrayList<String> cameras = new ArrayList<String>();
-    private ArrayList<Process> connexionsCam = new ArrayList<Process>();
+    private HashMap<String, Process> connexionsCam = new HashMap<String, Process>();
     private final String FILENAME = "./listeCam.txt";
     private boolean managing = false;
 
@@ -44,35 +46,45 @@ public class BoxEndpoint extends Endpoint {
         managing = true;
         String message = store.get(0);
         JSONObject msg = new JSONObject(message);
+        //Get cameras
         if(msg.getString("msg").compareTo("camera") == 0){
             System.out.println("Try to send cameras");
             try(BufferedReader br = new BufferedReader(new FileReader(FILENAME))){
-                String currentLine;
-                JSONObject obj = new JSONObject();
+                JSONArray arr = new JSONArray();
+                JSONObject camerasJSON = new JSONObject();
                 int i = 0;
+                String currentLine;
                 while((currentLine = br.readLine()) != null){
-                    obj.put("ip", currentLine);
-                    obj.put("name", "camera"+i);
+                    System.out.println(currentLine);
+                    JSONObject camera = new JSONObject();
+                    camera.put("ip", currentLine);
+                    camera.put("name", "camera"+i);
+                    arr.put(camera);
                     cameras.add(i, currentLine);
                     i++;
                 }
+                camerasJSON.put("cameras", arr);
                 if(i!=0){
-                    sendMessage(obj.toString());
+                    sendMessage(camerasJSON.toString());
                     store.remove(0);
                     managing = false;
                 }
             }
+        //Create connexion to camera
         } else if(msg.getString("msg").compareTo("connexion") == 0){
             String camera = msg.getString("camera");
-            camera.replaceAll("[^0-9]", "");
-            int i = Integer.parseInt(camera);
-            String ip = cameras.get(i);
+            camera = camera.replaceAll("[^0-9]", "");
+            int cameraId = Integer.parseInt(camera);
+            String ip = cameras.get(cameraId);
             String command = "ssh -f -N -T -l loic -R8554:"+ip+":80 51.15.227.253";
             Runtime rt = Runtime.getRuntime();
             Process pr = rt.exec(command);
-            connexionsCam.add(pr);
+            connexionsCam.put(camera, pr);
+        //Kill the connexion to a specific camera
         } else if(msg.getString("msg")=="kill"){
-            connexionsCam.get(0).destroy();
+            String camera = msg.getString("camera");
+            connexionsCam.get(camera).destroy();
+        //Everything else
         } else {
             System.out.println(msg);
         }
