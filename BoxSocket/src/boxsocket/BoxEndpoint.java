@@ -81,6 +81,7 @@ public class BoxEndpoint extends Endpoint {
             Process pr = rt.exec(command);
             System.out.println("Connexion with camera is opened !");
             connexionsCam.put(camera, pr);
+            store.remove(0);
             managing = false;
         //Kill the connexion to a specific camera
         } else if(msg.getString("msg").compareTo("kill") == 0){
@@ -88,10 +89,12 @@ public class BoxEndpoint extends Endpoint {
             String camera = msg.getString("camera");
             connexionsCam.get(camera).destroy();
             connexionsCam.remove(camera);
+            store.remove(0);
             managing = false;
         //Everything else
         } else {
             System.out.println(msg);
+            store.remove(0);
             managing = false;
         }
         
