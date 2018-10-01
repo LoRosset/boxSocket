@@ -76,7 +76,7 @@ public class BoxEndpoint extends Endpoint {
             camera = camera.replaceAll("[^0-9]", "");
             int cameraId = Integer.parseInt(camera);
             String ip = cameras.get(cameraId);
-            String command = "ssh -f -N -T -l loic -R8554:"+ip+":80 51.15.227.253";
+            String command = "ssh -f -N -T -l loic -R8554:"+ip+":80 camera-stream.tk";
             Runtime rt = Runtime.getRuntime();
             Process pr = rt.exec(command);
             System.out.println("Connexion with camera is opened !");
