@@ -22,8 +22,8 @@ public class BoxSocket {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         Session session = container.connectToServer(boxEndpoint, new URI("wss://camera-stream.tk:8001"));
         
-        //String macAddress = tools.GetNetworkAddress.GetAddress("mac");
-        String macAddress = "14-DA-E9-F4-6F-D6";
+        String macAddress = tools.GetNetworkAddress.GetAddress("mac");
+        //String macAddress = "14-DA-E9-F4-6F-D6";
         if(macAddress != null){
             System.out.println("Mac: "+ macAddress);
         }
