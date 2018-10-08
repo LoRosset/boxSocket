@@ -72,11 +72,12 @@ public class BoxEndpoint extends Endpoint {
             }
         //Create connexion to camera
         } else if(msg.getString("msg").compareTo("connexion") == 0){
+            String port = msg.getString("port");
             String camera = msg.getString("camera");
             camera = camera.replaceAll("[^0-9]", "");
             int cameraId = Integer.parseInt(camera);
             String ip = cameras.get(cameraId);
-            String command = "ssh -f -N -T -l loic -R8554:"+ip+":80 camera-stream.tk";
+            String command = "ssh -f -N -T -l loic -R"+port+":"+ip+":80 camera-stream.tk";
             Runtime rt = Runtime.getRuntime();
             Process pr = rt.exec(command);
             System.out.println("Connexion with camera is opened !");
