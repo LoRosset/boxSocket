@@ -77,7 +77,8 @@ public class BoxEndpoint extends Endpoint {
             camera = camera.replaceAll("[^0-9]", "");
             int cameraId = Integer.parseInt(camera);
             String ip = cameras.get(cameraId);
-            String command = "ssh -f -N -T -l loic -R"+port+":"+ip+":80 camera-stream.tk";
+            String connexionID = "conCam"+camera;
+            String command = "ssh -M -S "+connexionID+" -f -N -T -l loic -R"+port+":"+ip+":80 camera-stream.tk";
             Runtime rt = Runtime.getRuntime();
             Process pr = rt.exec(command);
             System.out.println("Connexion with camera is opened !");
@@ -89,7 +90,10 @@ public class BoxEndpoint extends Endpoint {
             System.out.println("Kill the connexion");
             String camera = msg.getString("camera");
             camera = camera.replaceAll("[^0-9]", "");
-            connexionsCam.get(camera).destroy();
+            String connexionID = "conCam"+camera;
+            String command = "ssh -S "+connexionID+" -O exit loic@camera-stream.tk";
+            Runtime rt = Runtime.getRuntime();
+            Process pr = rt.exec(command);
             connexionsCam.remove(camera);
             store.remove(0);
             managing = false;
