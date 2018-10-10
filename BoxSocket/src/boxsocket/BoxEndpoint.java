@@ -91,9 +91,12 @@ public class BoxEndpoint extends Endpoint {
             String camera = msg.getString("camera");
             camera = camera.replaceAll("[^0-9]", "");
             String connexionID = "conCam"+camera;
-            String command = "ssh -S "+connexionID+" -O exit loic@camera-stream.tk";
-            Runtime rt = Runtime.getRuntime();
-            Process pr = rt.exec(command);
+            try{
+                String command = "ssh -S "+connexionID+" -O exit loic@camera-stream.tk";
+                Runtime rt = Runtime.getRuntime();
+                Process pr = rt.exec(command);
+            }catch(Exception e){System.out.println(e);}
+            
             connexionsCam.remove(camera);
             store.remove(0);
             managing = false;
