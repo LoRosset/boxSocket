@@ -28,6 +28,18 @@ public class BoxEndpoint extends Endpoint {
     private final String FILENAME = "./listeCam.txt";
     private boolean managing = false;
 
+    public BoxEndpoint() throws FileNotFoundException, IOException {
+        try(BufferedReader br = new BufferedReader(new FileReader(FILENAME))){
+                int i = 0;
+                String currentLine;
+                while((currentLine = br.readLine()) != null){
+                    System.out.println(currentLine);
+                    cameras.add(i, currentLine);
+                    i++;
+                }
+        }
+    }
+    
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
@@ -48,28 +60,23 @@ public class BoxEndpoint extends Endpoint {
         JSONObject msg = new JSONObject(message);
         //Get cameras
         if(msg.getString("msg").compareTo("camera") == 0){
-            System.out.println("Try to send cameras");
-            try(BufferedReader br = new BufferedReader(new FileReader(FILENAME))){
+            System.out.println("Send cameras");
                 JSONArray arr = new JSONArray();
                 JSONObject camerasJSON = new JSONObject();
                 int i = 0;
-                String currentLine;
-                while((currentLine = br.readLine()) != null){
-                    System.out.println(currentLine);
+                for(String cameraIP : cameras){
                     JSONObject camera = new JSONObject();
-                    camera.put("ip", currentLine);
+                    camera.put("ip", cameraIP);
                     camera.put("name", "camera"+i);
                     arr.put(camera);
-                    cameras.add(i, currentLine);
                     i++;
                 }
                 camerasJSON.put("cameras", arr);
                 if(i!=0){
                     sendMessage(camerasJSON.toString());
-                    store.remove(0);
-                    managing = false;
                 }
-            }
+            store.remove(0);
+            managing = false;
         //Create connexion to camera
         } else if(msg.getString("msg").compareTo("connexion") == 0){
             String port = msg.getString("port");
