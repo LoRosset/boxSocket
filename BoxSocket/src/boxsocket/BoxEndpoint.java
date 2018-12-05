@@ -1,4 +1,3 @@
-
 package boxsocket;
 
 import java.io.BufferedReader;
@@ -43,9 +42,7 @@ public class BoxEndpoint extends Endpoint {
     @Override
     public void onOpen(Session session, EndpointConfig config) {
         this.session = session;
-        
         this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-
             @Override
             public void onMessage(String message) {
                 store.add(message);
@@ -89,6 +86,13 @@ public class BoxEndpoint extends Endpoint {
             Runtime rt = Runtime.getRuntime();
             Process pr = rt.exec(command);
             System.out.println("Connexion with camera is opened !");
+            //answer for the server
+            JSONObject answer = new JSONObject();
+            answer.put("msg", "stream");
+            answer.put("id", msg.getString("boxId"));
+            answer.put("cameraId", msg.getString("camera"));
+            answer.put("open", true);
+            sendMessage(answer.toString());
             connexionsCam.put(camera, pr);
             store.remove(0);
             managing = false;
@@ -98,12 +102,15 @@ public class BoxEndpoint extends Endpoint {
             String camera = msg.getString("camera");
             camera = camera.replaceAll("[^0-9]", "");
             String connexionID = "conCam"+camera;
-            try{
-                String command = "ssh -S "+connexionID+" -O exit loic@camera-stream.tk";
-                Runtime rt = Runtime.getRuntime();
-                Process pr = rt.exec(command);
-            }catch(Exception e){System.out.println(e);}
-            
+            String command = "ssh -S "+connexionID+" -O exit loic@camera-stream.tk";
+            Runtime rt = Runtime.getRuntime();
+            Process pr = rt.exec(command);
+            JSONObject answer = new JSONObject();
+            answer.put("msg", "stream");
+            answer.put("id", msg.getString("boxId"));
+            answer.put("cameraId", msg.getString("camera"));
+            answer.put("open", false);
+            sendMessage(answer.toString());
             connexionsCam.remove(camera);
             store.remove(0);
             managing = false;
@@ -136,8 +143,5 @@ public class BoxEndpoint extends Endpoint {
     public void sendObject(Object obj) throws IOException, EncodeException {
         this.session.getBasicRemote().sendObject(obj);
     }
-    
-    
-    
-    
+       
 }

@@ -28,8 +28,8 @@ public class BoxSocket {
             System.out.println("Mac: "+ macAddress);
         }
         JSONObject obj = new JSONObject();
-        obj.put("mac", macAddress);
-        
+        obj.put("msg", "verify");
+        obj.put("box", macAddress);
         boxEndpoint.sendMessage(obj.toString());
         
         while(session.isOpen()){
